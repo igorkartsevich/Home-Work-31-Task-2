@@ -98,10 +98,12 @@ public:
 
 void printData_vertexes(int number, std::vector<int>& vertexes, std::string next_prev) {
     std::cout << "\n\tVetrex number " << number << " has following vertexes " << next_prev << ": ";
+    
     if (vertexes.size() == 0) {
         std::cout << " No vertexes";
         return;
     }
+
     for (auto i : vertexes) std::cout << i << " ";
     vertexes.clear();
 }
@@ -162,13 +164,13 @@ int main()
     std::cout << "\nGetting information about vertexes of Graph.";
     getData_vertexes(listGraph, matrixGraph);
 
-    std::cout << "\nGetting information about vertexes of Graph_copy_1.";
+    std::cout << "\nGetting information about vertexes of ListGraph_copy_to_ListGraph.";
     IGraph* listGraph_new_1 = new ListGraph(*listGraph);
     getData_vertexes(listGraph, listGraph_new_1);
 
-    std::cout << "\nGetting information about vertexes of Graph_copy_2.";
-    IGraph* listGraph_new_2 = new ListGraph(*matrixGraph);
-    getData_vertexes(listGraph, listGraph_new_2);
+    std::cout << "\nGetting information about vertexes of MatrixGraph_copy_to_MatrixGrahp.";
+    IGraph* matrixGraph_new_1 = new MatrixGraph(*matrixGraph);
+    getData_vertexes(matrixGraph, matrixGraph_new_1);
 
     return 0;
 }

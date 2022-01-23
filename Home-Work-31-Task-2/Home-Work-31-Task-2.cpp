@@ -6,37 +6,44 @@ class IGraph {
 public:
     virtual ~IGraph() {}
     IGraph() {}
+    IGraph(const IGraph& other) {}
     virtual void AddEdge(int from, int to) = 0; // Метод принимает вершины начала и конца ребра и добавляет ребро
     virtual int VerticesCount() const = 0; // Метод должен считать текущее количество вершин
-    virtual void GetNextVertices(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной
+    virtual void GetNextVertices(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной  
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
+
+protected:
+    std::vector<std::vector<int>> graph_from;
+    std::vector<std::vector<int>> graph_to;
+
 };
 
 class ListGraph : public IGraph {
 public:
     virtual ~ListGraph() {}
     ListGraph() {}
+    ListGraph(const IGraph& other) {}
 
-    virtual void AddEdge(int from, int to) {
-        listGraph_from[from].push_back(to);
-        listGraph_to[to].push_back(from);
+    void AddEdge(int from, int to) override {
+        if (graph_from.size() < from) graph_from.resize(from);
+        if (graph_to.size() < to) graph_to.resize(to);
+
+        graph_from[from - 1].push_back(to);
+        graph_to[to - 1].push_back(from);
     }
 
-    virtual int VerticesCount() const {
-        return std::max(listGraph_from.rbegin()->first, listGraph_to.rbegin()->first);
+    int VerticesCount() const override {
+        return std::max(graph_from.size(), graph_to.size());
     }
 
-    virtual void GetNextVertices(int vertex, std::vector<int>& vertexes) const {
-        vertexes = listGraph_from.find(vertex)->second;
+    void GetNextVertices(int vertex, std::vector<int>& vertexes) const override {
+        vertexes = graph_from[--vertex];
     }
 
-    virtual void GetPrevVertices(int vertex, std::vector<int>& vertexes) const {
-        vertexes = listGraph_to.find(vertex)->second;
+    void GetPrevVertices(int vertex, std::vector<int>& vertexes) const override {
+        vertexes = graph_to[--vertex];
     }
 
-private:
-    std::map<int, std::vector<int>> listGraph_from;
-    std::map<int, std::vector<int>> listGraph_to;
 };
 
 class MatrixGraph : public IGraph {
@@ -44,44 +51,40 @@ public:
     virtual ~MatrixGraph() {}
     MatrixGraph() {}
 
-    virtual void AddEdge(int from, int to) {
+    void AddEdge(int from, int to) override {
         int matrixSize = std::max(from, to);
         
-        if (matrixGraph_from.size() < matrixSize) {
-            matrixGraph_from.resize(matrixSize);
-            matrixGraph_to.resize(matrixSize);
+        if (graph_from.size() < matrixSize) {
+            graph_from.resize(matrixSize);
+            graph_to.resize(matrixSize);
             for (int i = 0; i < matrixSize; ++i) {
-                matrixGraph_from[i].resize(matrixSize);
-                matrixGraph_to[i].resize(matrixSize);
+                graph_from[i].resize(matrixSize);
+                graph_to[i].resize(matrixSize);
             }
         }
 
         from--, to--;
-        matrixGraph_from[from][to] = 1;
-        matrixGraph_to[to][from] = 1;
+        graph_from[from][to] = 1;
+        graph_to[to][from] = 1;
     }
 
-    virtual int VerticesCount() const {
-        return matrixGraph_from.size();
+    int VerticesCount() const override {
+        return graph_from.size();
     }
 
-    virtual void GetNextVertices(int vertex, std::vector<int>& vertexes) const {
+    void GetNextVertices(int vertex, std::vector<int>& vertexes) const override {
         vertex--;
         int maxVertex = VerticesCount();
         for (int i = 0; i < maxVertex; ++i)
-            if (matrixGraph_from[vertex][i] == 1) vertexes.push_back(i + 1);
+            if (graph_from[vertex][i] == 1) vertexes.push_back(i + 1);
     }
 
-    virtual void GetPrevVertices(int vertex, std::vector<int>& vertexes) const {
+    void GetPrevVertices(int vertex, std::vector<int>& vertexes) const override {
         vertex--;
         int maxVertex = VerticesCount();
         for (int i = 0; i < maxVertex; ++i)
-            if (matrixGraph_to[vertex][i] == 1) vertexes.push_back(i + 1);
+            if (graph_to[vertex][i] == 1) vertexes.push_back(i + 1);
     }
-
-private:
-    std::vector<std::vector<int>> matrixGraph_from;
-    std::vector<std::vector<int>> matrixGraph_to;
 
 };
 
@@ -146,4 +149,6 @@ int main()
 
     std::cout << "\nGetting information about vertexes of Graph.";
     getData_vertexes(listGraph, matrixGraph);
+
+    return 0;
 }

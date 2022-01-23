@@ -5,8 +5,13 @@
 class IGraph {
 public:
     virtual ~IGraph() {}
-    IGraph() {}
-    IGraph(const IGraph& other) {}
+    IGraph() {
+        graph_from.clear();
+        graph_to.clear();
+    }
+    IGraph(const IGraph& other) {
+        *this = other;
+    }
     virtual void AddEdge(int from, int to) = 0; // Метод принимает вершины начала и конца ребра и добавляет ребро
     virtual int VertexesCount() const = 0; // Метод должен считать текущее количество вершин
     virtual void GetNextVertexes(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной  
@@ -21,8 +26,8 @@ protected:
 class ListGraph : public IGraph {
 public:
     virtual ~ListGraph() {}
-    ListGraph() {}
-    ListGraph(const IGraph& other) {}
+    ListGraph() : IGraph() {}
+    ListGraph(const IGraph& other) : IGraph(other) {}
 
     void AddEdge(int from, int to) override {
         if (graph_from.size() < from) graph_from.resize(from);
@@ -51,7 +56,8 @@ public:
 class MatrixGraph : public IGraph {
 public:
     virtual ~MatrixGraph() {}
-    MatrixGraph() {}
+    MatrixGraph() : IGraph() {}
+    MatrixGraph(const IGraph& other) : IGraph(other) {}
 
     void AddEdge(int from, int to) override {
         int matrixSize = std::max(from, to);
@@ -155,6 +161,14 @@ int main()
 
     std::cout << "\nGetting information about vertexes of Graph.";
     getData_vertexes(listGraph, matrixGraph);
+
+    std::cout << "\nGetting information about vertexes of Graph_copy_1.";
+    IGraph* listGraph_new_1 = new ListGraph(*listGraph);
+    getData_vertexes(listGraph, listGraph_new_1);
+
+    std::cout << "\nGetting information about vertexes of Graph_copy_2.";
+    IGraph* listGraph_new_2 = new ListGraph(*matrixGraph);
+    getData_vertexes(listGraph, listGraph_new_2);
 
     return 0;
 }

@@ -8,9 +8,9 @@ public:
     IGraph() {}
     IGraph(const IGraph& other) {}
     virtual void AddEdge(int from, int to) = 0; // Метод принимает вершины начала и конца ребра и добавляет ребро
-    virtual int VerticesCount() const = 0; // Метод должен считать текущее количество вершин
-    virtual void GetNextVertices(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной  
-    virtual void GetPrevVertices(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
+    virtual int VertexesCount() const = 0; // Метод должен считать текущее количество вершин
+    virtual void GetNextVertexes(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной  
+    virtual void GetPrevVertexes(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
 
 protected:
     std::vector<std::vector<int>> graph_from;
@@ -32,16 +32,16 @@ public:
         graph_to[to - 1].push_back(from);
     }
 
-    int VerticesCount() const override {
+    int VertexesCount() const override {
         return std::max(graph_from.size(), graph_to.size());
     }
 
-    void GetNextVertices(int vertex, std::vector<int>& vertexes) const override {
+    void GetNextVertexes(int vertex, std::vector<int>& vertexes) const override {
         if (graph_from.size() < vertex) return;
         vertexes = graph_from[--vertex];
     }
 
-    void GetPrevVertices(int vertex, std::vector<int>& vertexes) const override {
+    void GetPrevVertexes(int vertex, std::vector<int>& vertexes) const override {
         if (graph_to.size() < vertex) return;
         vertexes = graph_to[--vertex];
     }
@@ -70,20 +70,20 @@ public:
         graph_to[to][from] = 1;
     }
 
-    int VerticesCount() const override {
+    int VertexesCount() const override {
         return graph_from.size();
     }
 
-    void GetNextVertices(int vertex, std::vector<int>& vertexes) const override {
+    void GetNextVertexes(int vertex, std::vector<int>& vertexes) const override {
         vertex--;
-        int maxVertex = VerticesCount();
+        int maxVertex = VertexesCount();
         for (int i = 0; i < maxVertex; ++i)
             if (graph_from[vertex][i] == 1) vertexes.push_back(i + 1);
     }
 
-    void GetPrevVertices(int vertex, std::vector<int>& vertexes) const override {
+    void GetPrevVertexes(int vertex, std::vector<int>& vertexes) const override {
         vertex--;
-        int maxVertex = VerticesCount();
+        int maxVertex = VertexesCount();
         for (int i = 0; i < maxVertex; ++i)
             if (graph_to[vertex][i] == 1) vertexes.push_back(i + 1);
     }
@@ -121,7 +121,7 @@ void getData_vertexes(IGraph* listGraph, IGraph* matrixGraph) {
         std::cin >> vertexNumber;
         if (vertexNumber == 0) return;
 
-        if (vertexNumber > listGraph->VerticesCount()) {
+        if (vertexNumber > listGraph->VertexesCount()) {
             std::cerr << "This Graph does not contains vertex number " << vertexNumber;
             continue;
         }
@@ -129,15 +129,15 @@ void getData_vertexes(IGraph* listGraph, IGraph* matrixGraph) {
         std::vector<int> vertexes;
         
         std::cout << "ListGraph";
-        listGraph->GetNextVertices(vertexNumber, vertexes);
+        listGraph->GetNextVertexes(vertexNumber, vertexes);
         printData_vertexes(vertexNumber, vertexes, "next");
-        listGraph->GetPrevVertices(vertexNumber, vertexes);
+        listGraph->GetPrevVertexes(vertexNumber, vertexes);
         printData_vertexes(vertexNumber, vertexes, "previous");
 
         std::cout << "\nMatrixGraph";
-        matrixGraph->GetNextVertices(vertexNumber, vertexes);
+        matrixGraph->GetNextVertexes(vertexNumber, vertexes);
         printData_vertexes(vertexNumber, vertexes, "next");
-        matrixGraph->GetPrevVertices(vertexNumber, vertexes);
+        matrixGraph->GetPrevVertexes(vertexNumber, vertexes);
         printData_vertexes(vertexNumber, vertexes, "previous");
     }
 }
@@ -150,8 +150,8 @@ int main()
     std::cout << "Enter data for Graph.\n";
     setData_vertexes(listGraph, matrixGraph);
 
-    std::cout << "\nThe ListGraph has " << listGraph->VerticesCount() << " vertexes.\n";
-    std::cout << "The MatrixGraph has " << matrixGraph->VerticesCount() << " vertexes.\n";
+    std::cout << "\nThe ListGraph has " << listGraph->VertexesCount() << " vertexes.\n";
+    std::cout << "The MatrixGraph has " << matrixGraph->VertexesCount() << " vertexes.\n";
 
     std::cout << "\nGetting information about vertexes of Graph.";
     getData_vertexes(listGraph, matrixGraph);

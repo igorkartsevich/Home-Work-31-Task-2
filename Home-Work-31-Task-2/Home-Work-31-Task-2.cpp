@@ -12,12 +12,12 @@ public:
     IGraph(const IGraph& other) {
         *this = other;
     }
-
     virtual void AddEdge(int from, int to) = 0; // Метод принимает вершины начала и конца ребра и добавляет ребро
     virtual int VertexesCount() const = 0; // Метод должен считать текущее количество вершин
     virtual void GetNextVertexes(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной  
     virtual void GetPrevVertexes(int vertex, std::vector<int>& vertexes) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
     virtual void printVertexes(int number, std::vector<int>& vertexes, std::string next_prev) const = 0;
+
 protected:
     std::vector<std::vector<int>> graph_from;
     std::vector<std::vector<int>> graph_to;

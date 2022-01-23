@@ -26,9 +26,9 @@ public:
 
     void AddEdge(int from, int to) override {
         if (graph_from.size() < from) graph_from.resize(from);
-        if (graph_to.size() < to) graph_to.resize(to);
-
         graph_from[from - 1].push_back(to);
+
+        if (graph_to.size() < to) graph_to.resize(to);
         graph_to[to - 1].push_back(from);
     }
 
@@ -37,10 +37,12 @@ public:
     }
 
     void GetNextVertices(int vertex, std::vector<int>& vertexes) const override {
+        if (graph_from.size() < vertex) return;
         vertexes = graph_from[--vertex];
     }
 
     void GetPrevVertices(int vertex, std::vector<int>& vertexes) const override {
+        if (graph_to.size() < vertex) return;
         vertexes = graph_to[--vertex];
     }
 
@@ -90,6 +92,10 @@ public:
 
 void printData_vertexes(int number, std::vector<int>& vertexes, std::string next_prev) {
     std::cout << "\n\tVetrex number " << number << " has following vertexes " << next_prev << ": ";
+    if (vertexes.size() == 0) {
+        std::cout << " No vertexes";
+        return;
+    }
     for (auto i : vertexes) std::cout << i << " ";
     vertexes.clear();
 }

@@ -17,11 +17,7 @@ class MatrixGraph : public IGraph {
 public:
     virtual ~MatrixGraph() {}
 
-    MatrixGraph() {
-        verticesCounter = 0;
-        graph_next.clear();
-        graph_prev.clear();
-    }
+    MatrixGraph() : verticesCounter(0) {}
 
     MatrixGraph(const MatrixGraph& other_graph) : IGraph(other_graph) {
         graph_next = other_graph.graph_next;

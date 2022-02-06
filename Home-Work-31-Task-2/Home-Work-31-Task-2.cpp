@@ -13,31 +13,30 @@ public:
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
 };
 
-class MatrixGraph : public IGraph {
+class ListGraph : public IGraph {
 public:
-    virtual ~MatrixGraph() {}
+    virtual ~ListGraph() {}
 
-    MatrixGraph() : verticesCounter(0) {}
+    ListGraph() : verticesCounter(0) {}
 
-    MatrixGraph(const MatrixGraph& other_graph) : IGraph(other_graph) {
-        graph_next = other_graph.graph_next;
-        graph_prev = other_graph.graph_prev;
+    ListGraph(const ListGraph& other_graph) : IGraph(other_graph) {
+        list_next = other_graph.list_next;
+        list_prev = other_graph.list_prev;
     }
 
     virtual void AddEdge(int from, int to) override {
-        bool is_from_not_in_from = (graph_next.find(from) == graph_next.end());
-        bool is_from_not_in_to = (graph_prev.find(from) == graph_prev.end());
-        bool is_to_not_in_from = (graph_next.find(to) == graph_next.end());
-        bool is_to_not_in_to = (graph_prev.find(to) == graph_prev.end());
+        bool is_adge_from_to = (list_next.find(from) != list_next.end() && list_prev.find(to) != list_prev.end());
+        bool is_from_in_vertices = (list_next.find(from) != list_next.end() || list_prev.find(from) != list_prev.end());
+        bool is_to_in_vertices = (list_next.find(to) != list_next.end() || list_prev.find(to) != list_prev.end());
 
-        if (is_from_not_in_from || is_to_not_in_to) {
+        if (!is_adge_from_to) {
 
-            if (is_from_not_in_from && is_from_not_in_to) verticesCounter++;
-            if (is_to_not_in_to && is_to_not_in_from) verticesCounter++;
+            if (!is_from_in_vertices) verticesCounter++;
+            if (!is_to_in_vertices) verticesCounter++;
             if (from == to) verticesCounter--;
 
-            graph_next[from].push_back(to);
-            graph_prev[to].push_back(from);
+            list_next[from].push_back(to);
+            list_prev[to].push_back(from);
         }
         return;
     }
@@ -48,31 +47,53 @@ public:
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex < std::max(graph_next.size(), graph_prev.size())) {
-            for (auto i : graph_next.find(vertex)->second) vertices.push_back(i); 
-        }
+        if (vertex < std::max(list_next.size(), list_prev.size()))
+            for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
         else std::cout << "This Graph does not contain vertex number " << vertex;
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex < std::max(graph_next.size(), graph_prev.size())) {
-            for (auto i : graph_prev.find(vertex)->second) vertices.push_back(i);
-        }
+        if (vertex < std::max(list_next.size(), list_prev.size()))
+            for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
         else std::cout << "This Graph does not contain vertex number " << vertex;
         return;
     }
 
 private:
     int verticesCounter;
-    std::map<int, std::vector<int>> graph_next;
-    std::map<int, std::vector<int>> graph_prev;
+    std::map<int, std::vector<int>> list_next;
+    std::map<int, std::vector<int>> list_prev;
+
+};
+
+class MatrixGraph : public IGraph {
+public:
+    virtual ~MatrixGraph() {}
+
+    MatrixGraph() : verticesCounter(0) {}
+
+    MatrixGraph(const MatrixGraph& other_graph) : IGraph(other_graph) {
+        
+    }
+
+    virtual void AddEdge(int from, int to) override {
+        
+
+
+        return;
+    }
+
+private:
+    int verticesCounter;
+    std::map<int, std::map<int, bool>> matrix_next;
+    std::map<int, std::map<int, bool>> matrix_prev;
 };
 
 int main()
 {
-    MatrixGraph g1;
+    ListGraph g1;
 
     g1.AddEdge(1, 2);
     g1.AddEdge(1, 4);
@@ -91,7 +112,9 @@ int main()
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
 
-    MatrixGraph g2(g1);
+    ListGraph g2(g1);
+    ListGraph g3;
+    g3 = g2;
 
-    //ListGraph g2 = g1;
+    //MatrixGraph g2 = g1;
 }

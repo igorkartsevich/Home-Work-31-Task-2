@@ -5,22 +5,25 @@
 class IGraph {
 public:
     virtual ~IGraph() {}
-    IGraph() {};
-    IGraph(const IGraph& other_graph) {};
+    IGraph() : verticesCounter(0) {};
+    IGraph(const IGraph& other_graph) : verticesCounter(other_graph.verticesCounter) {};
     virtual void AddEdge(int from, int to) = 0; // Метод принимает вершины начала и конца ребра и добавляет ребро
     virtual int VerticesCount() const = 0; // Метод должен считать текущее количество вершин
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, в которые можно дойти по ребру из данной
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const = 0; // Для конкретной вершины метод выводит в вектор “вершины” все вершины, из которых можно дойти по ребру в данную
+
+protected:
+    int verticesCounter;
+    std::map<int, int> vertex_to_index;
 };
 
 class ListGraph : public IGraph {
 public:
     virtual ~ListGraph() {}
 
-    ListGraph() : verticesCounter(0) {}
+    ListGraph() : IGraph() {}
 
     ListGraph(const ListGraph& other_graph) {
-        verticesCounter = other_graph.verticesCounter;
         list_next = other_graph.list_next;
         list_prev = other_graph.list_prev;
     }
@@ -79,10 +82,9 @@ class MatrixGraph : public IGraph {
 public:
     virtual ~MatrixGraph() {}
 
-    MatrixGraph() : verticesCounter(0) {}
+    MatrixGraph() : IGraph() {}
 
-    MatrixGraph(const MatrixGraph& other_graph) {
-        verticesCounter = other_graph.verticesCounter;
+    MatrixGraph(const MatrixGraph& other_graph) : IGraph(other_graph) { 
         vertex_to_index = other_graph.vertex_to_index;
         index_to_vertex = other_graph.index_to_vertex;
         matrix = other_graph.matrix;
@@ -145,8 +147,6 @@ public:
     }
 
 private:
-    int verticesCounter;
-    std::map<int, int> vertex_to_index;
     std::vector<int> index_to_vertex;
     std::vector<std::vector<int>> matrix;
 };

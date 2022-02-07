@@ -14,7 +14,6 @@ public:
 
 protected:
     int verticesCounter;
-    std::vector<int> index_to_vertex;
 };
 
 class ListGraph : public IGraph {

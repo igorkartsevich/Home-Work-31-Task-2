@@ -14,6 +14,7 @@ public:
 
 protected:
     int verticesCounter;
+    std::vector<int> index_to_vertex;
 };
 
 class ListGraph : public IGraph {
@@ -141,10 +142,6 @@ public:
         return;
     }
 
-    std::vector<int> GetVerticesList() const {
-        return index_to_vertex;
-    }
-
 private:
     std::map<int, int> vertex_to_index;
     std::vector<int> index_to_vertex;
@@ -153,27 +150,6 @@ private:
 
 int main()
 {
-    ListGraph lg1;
-
-    lg1.AddEdge(1, 2);
-    lg1.AddEdge(1, 4);
-    lg1.AddEdge(1, 2);
-    lg1.AddEdge(100, 100);
-    lg1.AddEdge(100, 100);
-    lg1.AddEdge(-1, 1);
-
-    std::cout << "This Graph contains " << lg1.VerticesCount() << " vertices\n";
-    
-    std::vector<int> vertices;
-    lg1.GetNextVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
-    std::cout << "\n";
-    lg1.GetPrevVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
-    std::cout << "\n";
-
-    ListGraph lg2(lg1);
-
     MatrixGraph mg1;
 
     mg1.AddEdge(1, 2);
@@ -185,6 +161,7 @@ int main()
 
     std::cout << "This Graph contains " << mg1.VerticesCount() << " vertices\n";
 
+    std::vector<int> vertices;
     mg1.GetNextVertices(1, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
@@ -194,5 +171,5 @@ int main()
 
     MatrixGraph mg2(mg1);
 
-    ListGraph lg55(mg2);
+    //ListGraph lg1(mg2);
 }

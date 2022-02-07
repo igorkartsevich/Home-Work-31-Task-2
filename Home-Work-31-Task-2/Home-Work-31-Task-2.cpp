@@ -68,7 +68,6 @@ public:
     }
 
 private:
-    int verticesCounter;
     std::map<int, std::vector<int>> list_next;
     std::map<int, std::vector<int>> list_prev;
 };

@@ -47,15 +47,21 @@ public:
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (list_next.find(vertex) == list_next.end()) std::cout << "Vertex " << vertex << " does not have next vertices";
-        else for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
+        if (list_next.find(vertex) == list_next.end()) std::cout << "This Graph does not contain vertex " << vertex;
+        else {
+            std::cout << "Vertex " << vertex << " has following NEXT vertices: ";
+            for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
+        }
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (list_prev.find(vertex) == list_prev.end()) std::cout << "Vertex " << vertex << " does not have previous vertices";
-        else for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
+        if (list_prev.find(vertex) == list_prev.end()) std::cout << "This Graph does not contain vertex " << vertex;
+        else {
+            std::cout << "Vertex " << vertex << " has following NEXT vertices: ";
+            for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
+        }
         return;
     }
 
@@ -187,4 +193,6 @@ int main()
     mg1.GetPrevVertices(1, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
+
+    MatrixGraph mg2(mg1);
 }

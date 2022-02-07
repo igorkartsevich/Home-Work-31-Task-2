@@ -14,7 +14,6 @@ public:
 
 protected:
     int verticesCounter;
-    std::map<int, int> vertex_to_index;
 };
 
 class ListGraph : public IGraph {
@@ -23,13 +22,9 @@ public:
 
     ListGraph() : IGraph() {}
 
-    ListGraph(const ListGraph& other_graph) {
+    ListGraph(const ListGraph& other_graph) : IGraph(other_graph) {
         list_next = other_graph.list_next;
         list_prev = other_graph.list_prev;
-    }
-
-    ListGraph& operator=(const class MatrixGraph& other_graph) {
-        
     }
 
     virtual void AddEdge(int from, int to) override {
@@ -146,7 +141,12 @@ public:
         return;
     }
 
+    std::vector<int> GetVerticesList() const {
+        return index_to_vertex;
+    }
+
 private:
+    std::map<int, int> vertex_to_index;
     std::vector<int> index_to_vertex;
     std::vector<std::vector<int>> matrix;
 };
@@ -194,5 +194,5 @@ int main()
 
     MatrixGraph mg2(mg1);
 
-    //ListGraph lg55 = mg2;
+    ListGraph lg55(mg2);
 }

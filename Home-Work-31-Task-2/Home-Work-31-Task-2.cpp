@@ -20,9 +20,13 @@ public:
     ListGraph() : verticesCounter(0) {}
 
     ListGraph(const ListGraph& other_graph) {
-        verticesCounter = 0;
+        verticesCounter = other_graph.verticesCounter;
         list_next = other_graph.list_next;
         list_prev = other_graph.list_prev;
+    }
+
+    ListGraph& operator=(const class MatrixGraph& other_graph) {
+        
     }
 
     virtual void AddEdge(int from, int to) override {
@@ -59,7 +63,7 @@ public:
         vertices.clear();
         if (list_prev.find(vertex) == list_prev.end()) std::cout << "This Graph does not contain vertex " << vertex;
         else {
-            std::cout << "Vertex " << vertex << " has following NEXT vertices: ";
+            std::cout << "Vertex " << vertex << " has following PREVIOUS vertices: ";
             for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
         }
         return;
@@ -75,14 +79,13 @@ class MatrixGraph : public IGraph {
 public:
     virtual ~MatrixGraph() {}
 
-    MatrixGraph() : vertices_counter(0) {}
+    MatrixGraph() : verticesCounter(0) {}
 
     MatrixGraph(const MatrixGraph& other_graph) {
-        vertices_counter = 0;
+        verticesCounter = other_graph.verticesCounter;
         vertex_to_index = other_graph.vertex_to_index;
         index_to_vertex = other_graph.index_to_vertex;
-        matrix_from = other_graph.matrix_from;
-        matrix_to = other_graph.matrix_to;
+        matrix = other_graph.matrix;
     }
 
     virtual void AddEdge(int from, int to) override {
@@ -91,34 +94,30 @@ public:
 
         if (!is_from_in_vertices || !is_to_in_vertices) {
             if (!is_from_in_vertices) {
-                vertex_to_index[from] = ++vertices_counter;
+                vertex_to_index[from] = ++verticesCounter;
                 index_to_vertex.push_back(from);
             }
             if (!is_to_in_vertices) {
-                vertex_to_index[to] = ++vertices_counter;
+                vertex_to_index[to] = ++verticesCounter;
                 index_to_vertex.push_back(to);
             }
             
-            matrix_from.resize(vertices_counter);
-            for (int i = 0; i < matrix_from.size(); ++i) matrix_from[i].resize(vertices_counter);
-
-            matrix_to.resize(vertices_counter);
-            for (int i = 0; i < matrix_to.size(); ++i) matrix_to[i].resize(vertices_counter);
+            matrix.resize(verticesCounter);
+            for (int i = 0; i < matrix.size(); ++i) matrix[i].resize(verticesCounter);
         }
 
         int index_from = vertex_to_index.find(from)->second - 1;
         int index_to = vertex_to_index.find(to)->second - 1;
 
-        if (matrix_from[index_from][index_to] != 1 && matrix_to[index_to][index_from] != 1) {
-            matrix_from[index_from][index_to] = 1;
-            matrix_to[index_to][index_from] = 1;
+        if (matrix[index_from][index_to] != 1) {
+            matrix[index_from][index_to] = 1;
         }
         
         return;
     }
 
     virtual int VerticesCount() const override {
-        return matrix_from.size() - 1;
+        return matrix.size() - 1;
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
@@ -127,8 +126,8 @@ public:
         else {
             std::cout << "Vertex " << vertex << " has following NEXT vertices: ";
             int vertex_ID_ = vertex_to_index.find(vertex)->second - 1;
-            for (int i = 0; i < matrix_from[vertex_ID_].size(); ++i)
-                if(matrix_from[vertex_ID_][i] == 1) std::cout << index_to_vertex[i] << " ";
+            for (int i = 0; i < matrix[vertex_ID_].size(); ++i)
+                if(matrix[vertex_ID_][i] == 1) std::cout << index_to_vertex[i] << " ";
         }
         return;
     }
@@ -139,18 +138,17 @@ public:
         else {
             std::cout << "Vertex " << vertex << " has following PREVIOUS vertices: ";
             int vertex_ID_ = vertex_to_index.find(vertex)->second - 1;
-            for (int i = 0; i < matrix_to[vertex_ID_].size(); ++i)
-                if (matrix_to[vertex_ID_][i] == 1) std::cout << index_to_vertex[i] << " ";
+            for (int i = 0; i < matrix.size(); ++i)
+                if (matrix[i][vertex_ID_] == 1) std::cout << index_to_vertex[i] << " ";
         }
         return;
     }
 
 private:
-    int vertices_counter;
+    int verticesCounter;
     std::map<int, int> vertex_to_index;
     std::vector<int> index_to_vertex;
-    std::vector<std::vector<int>> matrix_from;
-    std::vector<std::vector<int>> matrix_to;
+    std::vector<std::vector<int>> matrix;
 };
 
 int main()
@@ -195,4 +193,6 @@ int main()
     std::cout << "\n";
 
     MatrixGraph mg2(mg1);
+
+    //ListGraph lg55 = mg2;
 }

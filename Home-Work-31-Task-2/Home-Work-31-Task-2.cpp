@@ -61,8 +61,8 @@ public:
         std::vector<int> verticesList;
         for(auto i : list_next) verticesList.push_back(i.first);
 
-        bool is_vertices = false;
         for(auto i : list_prev) {
+            bool is_vertices = false;
             for(auto j : verticesList) {
                 if(j == i.first) {
                     is_vertices = true;
@@ -137,15 +137,15 @@ public:
     }
 
     virtual std::vector<int> VerticesList() const override {
-        std::vector<int> verticesList;
-        return verticesList;
+        return index_to_vertex;
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         vertices.clear();
+        int index_from = vertex_to_index.find(vertex)->second;
         for (int i = 0; i < verticesCounter; ++i) {
-            if (matrix[vertex][i] == 1) vertices.push_back(i);
+            if (matrix[index_from][i] == 1) vertices.push_back(index_to_vertex[i]);
         }
         return;
     }
@@ -153,8 +153,9 @@ public:
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         vertices.clear();
+        int index_to = vertex_to_index.find(vertex)->second;
         for (int i = 0; i < verticesCounter; ++i) {
-            if (matrix[i][vertex] == 1) vertices.push_back(i);
+            if (matrix[i][index_to] == 1) vertices.push_back(index_to_vertex[i]);
         }
         return;
     }
@@ -176,6 +177,18 @@ int main()
     mg1.AddEdge(100, 100);
     mg1.AddEdge(-1, 1);
 
+    std::cout << mg1.VerticesCount() << "\n";
 
+    std::vector<int> vertices_list;
+    vertices_list = mg1.VerticesList();
+    for (auto i : vertices_list) std::cout << i << " ";
+    std::cout << "\n";
 
+    std::vector<int> vertices;
+    mg1.GetNextVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " ";
+    std::cout << "\n";
+    mg1.GetPrevVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " ";
+    std::cout << "\n";
 }

@@ -24,31 +24,68 @@ public:
     ListGraph() : IGraph() {}
 
     ListGraph(const ListGraph& other_graph) : IGraph(other_graph) {
-        
+        list_next = other_graph.list_next;
+        list_prev = other_graph.list_prev;
     }
 
     virtual void AddEdge(int from, int to) override {
-        
+        bool is_from_in_vertices = (list_next.find(from) != list_next.end());
+        if (!is_from_in_vertices) verticesCounter++;
+
+        bool is_to_in_vertices = (list_prev.find(to) != list_prev.end());
+        if (!is_to_in_vertices && from != to) verticesCounter++;
+
+        bool is_adge_from_to = false;
+        if (is_from_in_vertices) {
+            for (auto i : list_next.find(from)->second) {
+                if (i == to) {
+                    is_adge_from_to = true;
+                    break;
+                }
+            }
+        }
+
+        if (!is_adge_from_to) {
+            list_next[from].push_back(to);
+            list_prev[to].push_back(from);
+        }
+
         return;
     }
 
     virtual int VerticesCount() const override {
-
-        return;
+        return verticesCounter;
     }
 
     virtual std::vector<int> VerticesList() const override {
-        
-        return;
+        std::vector<int> verticesList;
+        for(auto i : list_next) verticesList.push_back(i.first);
+
+        bool is_vertices = false;
+        for(auto i : list_prev) {
+            for(auto j : verticesList) {
+                if(j == i.first) {
+                    is_vertices = true;
+                    break;
+                }
+            }
+            if (!is_vertices) verticesList.push_back(i.first);
+        }
+
+        return verticesList;
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
-        
+        if (list_next.find(vertex) == list_next.end()) return;
+        vertices.clear();
+        for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
-        
+        if (list_prev.find(vertex) == list_prev.end()) return;
+        vertices.clear();
+        for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
         return;
     }
 
@@ -68,25 +105,57 @@ public:
     }
 
     virtual void AddEdge(int from, int to) override {
+        bool is_fron_in_vertices = (vertex_to_index.find(from) != vertex_to_index.end());
+        if (!is_fron_in_vertices) {
+            verticesCounter++;
+            index_to_vertex.push_back(from);
+            vertex_to_index[from] = verticesCounter - 1;
+        }
+
+        bool is_to_in_vertices = (vertex_to_index.find(to) != vertex_to_index.end());
+        if (from != to && !is_to_in_vertices) {
+            verticesCounter++;
+            index_to_vertex.push_back(to);
+            vertex_to_index[to] = verticesCounter - 1;
+        }
+
+        if (matrix.size() != verticesCounter) {
+            matrix.resize(verticesCounter);
+            for (int i = 0; i < matrix.size(); ++i) matrix[i].resize(verticesCounter);
+        }
+
+        int index_from = vertex_to_index.find(from)->second;
+        int index_to = vertex_to_index.find(to)->second;
+
+        if(matrix[index_from][index_to] != 1) matrix[index_from][index_to] = 1;
 
         return;
     }
 
     virtual int VerticesCount() const override {
-        return;
+        return verticesCounter;
     }
 
     virtual std::vector<int> VerticesList() const override {
-        return;
+        std::vector<int> verticesList;
+        return verticesList;
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
-        
+        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
+        vertices.clear();
+        for (int i = 0; i < verticesCounter; ++i) {
+            if (matrix[vertex][i] == 1) vertices.push_back(i);
+        }
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
-        
+        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
+        vertices.clear();
+        for (int i = 0; i < verticesCounter; ++i) {
+            if (matrix[i][vertex] == 1) vertices.push_back(i);
+        }
         return;
     }
 
@@ -98,7 +167,7 @@ private:
 
 int main()
 {
-    ListGraph mg1;
+    MatrixGraph mg1;
 
     mg1.AddEdge(1, 1);
     mg1.AddEdge(1, 4);
@@ -106,5 +175,7 @@ int main()
     mg1.AddEdge(100, 100);
     mg1.AddEdge(100, 100);
     mg1.AddEdge(-1, 1);
+
+
 
 }

@@ -196,25 +196,21 @@ ListGraph::ListGraph(const class MatrixGraph& other_graph) : IGraph(other_graph)
 
 MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_graph) {
     index_to_vertex = other_graph.VerticesList();
-    int matrix_size = index_to_vertex.size();
+    int verticesCounter = index_to_vertex.size();
+    
+    for (int i = 0; i < verticesCounter; ++i)
+        vertex_to_index[index_to_vertex[i]] = i;
 
-    for (int i = 0; i < matrix_size; ++i) vertex_to_index[index_to_vertex[i]] = i;
-
-    matrix.resize(matrix_size);
-    for(int i = 0; i < matrix_size; ++i) matrix[i].resize(matrix_size);
+    matrix.resize(verticesCounter);
+    for (int i = 0; i < verticesCounter; ++i)
+        matrix[i].resize(verticesCounter);
 
     for (auto i : index_to_vertex) {
         std::vector<int> vertices;
-        
         other_graph.GetNextVertices(i, vertices);
-        for (auto j : vertices) {
-            matrix[vertex_to_index.find(i)->second][vertex_to_index.find(j)->second] = 1;
-        }
 
-        other_graph.GetPrevVertices(i, vertices);
-        for (auto j : vertices) {
-            matrix[vertex_to_index.find(j)->second][vertex_to_index.find(i)->second] = 1;
-        }
+        for (auto j : vertices)
+            matrix[vertex_to_index.find(i)->second][vertex_to_index.find(j)->second] = 1;
     }
 }
 
@@ -252,10 +248,10 @@ int main()
     for (auto i : vertices_list) std::cout << i << " ";
     std::cout << "\n";
 
-    lg1.GetNextVertices(1, vertices);
+    lg1.GetNextVertices(4, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
-    lg1.GetPrevVertices(1, vertices);
+    lg1.GetPrevVertices(4, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
 }

@@ -30,10 +30,10 @@ public:
 
     virtual void AddEdge(int from, int to) override {
         bool is_from_in_vertices = (list_next.find(from) != list_next.end() || list_prev.find(from) != list_prev.end());
-        bool is_to_in_vertices = (list_next.find(to) != list_next.end() || list_prev.find(to) != list_prev.end());
 
         bool is_adge_from_to = false;
         if (is_from_in_vertices) {
+
             for (auto i : list_next.find(from)->second) {
                 if (i == to) {
                     is_adge_from_to = true;
@@ -52,16 +52,18 @@ public:
 
     virtual int VerticesCount() const override {
         int verticesCounter = list_next.size();
-        
-        for (auto i : list_prev) {
-            bool is_vertices = false;
-            for (auto j : list_next) {
-                if (j.first == i.first) {
-                    is_vertices = true;
+
+        for (auto vertex_prev : list_prev) {
+            bool is_prev_in_next = false;
+
+            for (auto vertex_next : list_next) {
+                if (vertex_prev.first == vertex_next.first) {
+                    is_prev_in_next = true;
                     break;
                 }
             }
-            if (!is_vertices) verticesCounter++;
+
+            if (!is_prev_in_next) verticesCounter++;
         }
 
         return verticesCounter;
@@ -71,15 +73,17 @@ public:
         std::vector<int> verticesList;
         for(auto i : list_next) verticesList.push_back(i.first);
 
-        for(auto i : list_prev) {
-            bool is_vertices = false;
-            for(auto j : verticesList) {
-                if(j == i.first) {
-                    is_vertices = true;
+        for(auto vertex_prev : list_prev) {
+            bool is_prev_in_next = false;
+
+            for(auto vertex_next : list_next) {
+                if(vertex_prev.first == vertex_next.first) {
+                    is_prev_in_next = true;
                     break;
                 }
             }
-            if (!is_vertices) verticesList.push_back(i.first);
+
+            if (!is_prev_in_next) verticesList.push_back(vertex_prev.first);
         }
 
         return verticesList;
@@ -87,15 +91,21 @@ public:
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (list_next.find(vertex) == list_next.end()) return;
-        for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
+
+        if (list_next.find(vertex) != list_next.end()) 
+            for (auto i : list_next.find(vertex)->second)
+                vertices.push_back(i);
+
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (list_prev.find(vertex) == list_prev.end()) return;
-        for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
+
+        if (list_prev.find(vertex) != list_prev.end())
+            for (auto i : list_prev.find(vertex)->second)
+                vertices.push_back(i);
+
         return;
     }
 
@@ -133,13 +143,15 @@ public:
 
         if (matrix.size() != index_to_vertex.size()) {
             matrix.resize(index_to_vertex.size());
-            for (int i = 0; i < matrix.size(); ++i) matrix[i].resize(index_to_vertex.size());
+            for (int i = 0; i < matrix.size(); ++i)
+                matrix[i].resize(index_to_vertex.size());
         }
 
         int index_from = vertex_to_index.find(from)->second;
         int index_to = vertex_to_index.find(to)->second;
 
-        if(matrix[index_from][index_to] != 1) matrix[index_from][index_to] = 1;
+        if(matrix[index_from][index_to] != 1)
+            matrix[index_from][index_to] = 1;
 
         return;
     }
@@ -154,21 +166,24 @@ public:
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
-        int index_from = vertex_to_index.find(vertex)->second;
-        for (int i = 0; i < index_to_vertex.size(); ++i) {
-            if (matrix[index_from][i] == 1) vertices.push_back(index_to_vertex[i]);
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+
+            int index_from = vertex_to_index.find(vertex)->second;
+            for (int i = 0; i < index_to_vertex.size(); ++i)
+                if (matrix[index_from][i] == 1) vertices.push_back(index_to_vertex[i]);
         }
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
-        int index_to = vertex_to_index.find(vertex)->second;
-        for (int i = 0; i < index_to_vertex.size(); ++i) {
-            if (matrix[i][index_to] == 1) vertices.push_back(index_to_vertex[i]);
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+
+            int index_to = vertex_to_index.find(vertex)->second;
+            for (int i = 0; i < index_to_vertex.size(); ++i)
+                if (matrix[i][index_to] == 1) vertices.push_back(index_to_vertex[i]);
         }
+        
         return;
     }
 
@@ -213,7 +228,7 @@ MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_grap
 
 int main()
 {
-    MatrixGraph mg1;
+    ListGraph mg1;
 
     mg1.AddEdge(1, 2);
     mg1.AddEdge(1, 4);

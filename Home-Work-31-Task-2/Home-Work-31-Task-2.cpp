@@ -86,15 +86,15 @@ public:
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
-        if (list_next.find(vertex) == list_next.end()) return;
         vertices.clear();
+        if (list_next.find(vertex) == list_next.end()) return;
         for (auto i : list_next.find(vertex)->second) vertices.push_back(i);
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
-        if (list_prev.find(vertex) == list_prev.end()) return;
         vertices.clear();
+        if (list_prev.find(vertex) == list_prev.end()) return;
         for (auto i : list_prev.find(vertex)->second) vertices.push_back(i);
         return;
     }
@@ -153,8 +153,8 @@ public:
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
-        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         vertices.clear();
+        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         int index_from = vertex_to_index.find(vertex)->second;
         for (int i = 0; i < index_to_vertex.size(); ++i) {
             if (matrix[index_from][i] == 1) vertices.push_back(index_to_vertex[i]);
@@ -163,8 +163,8 @@ public:
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
-        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         vertices.clear();
+        if (vertex_to_index.find(vertex) == vertex_to_index.end()) return;
         int index_to = vertex_to_index.find(vertex)->second;
         for (int i = 0; i < index_to_vertex.size(); ++i) {
             if (matrix[i][index_to] == 1) vertices.push_back(index_to_vertex[i]);
@@ -179,18 +179,15 @@ private:
 };
 
 ListGraph::ListGraph(const class MatrixGraph& other_graph) : IGraph(other_graph) {
-    std::vector<int> vertices_list;
-    vertices_list = other_graph.VerticesList();
+    for (auto vertex : other_graph.VerticesList()) {
+        std::vector<int> verticesList;
+        other_graph.GetNextVertices(vertex, verticesList);
+        if (verticesList.size() != 0)
+            for (auto next_vertex : verticesList) list_next[vertex].push_back(next_vertex);
 
-    for (auto vertex : vertices_list) {
-        std::vector<int> vertices;
-        other_graph.GetNextVertices(vertex, vertices);
-        if (vertices.size() != 0)
-            for (auto next_vertex : vertices) list_next[vertex].push_back(next_vertex);
-
-        other_graph.GetPrevVertices(vertex, vertices);
-        if (vertices.size() != 0)
-            for (auto next_prev : vertices) list_prev[vertex].push_back(next_prev);
+        other_graph.GetPrevVertices(vertex, verticesList);
+        if (verticesList.size() != 0)
+            for (auto next_prev : verticesList) list_prev[vertex].push_back(next_prev);
     }
 }
 
@@ -205,18 +202,18 @@ MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_grap
     for (int i = 0; i < verticesCounter; ++i)
         matrix[i].resize(verticesCounter);
 
-    for (auto i : index_to_vertex) {
-        std::vector<int> vertices;
-        other_graph.GetNextVertices(i, vertices);
+    for (auto vertex : index_to_vertex) {
+        std::vector<int> next_vertices;
+        other_graph.GetNextVertices(vertex, next_vertices);
 
-        for (auto j : vertices)
-            matrix[vertex_to_index.find(i)->second][vertex_to_index.find(j)->second] = 1;
+        for (auto next_vertex : next_vertices)
+            matrix[vertex_to_index.find(vertex)->second][vertex_to_index.find(next_vertex)->second] = 1;
     }
 }
 
 int main()
 {
-    ListGraph mg1;
+    MatrixGraph mg1;
 
     mg1.AddEdge(1, 2);
     mg1.AddEdge(1, 4);
@@ -240,7 +237,7 @@ int main()
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
 
-    MatrixGraph lg1(mg1);
+    ListGraph lg1(mg1);
 
     std::cout << lg1.VerticesCount() << "\n";
 

@@ -228,7 +228,7 @@ MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_grap
 
 int main()
 {
-    ListGraph mg1;
+    MatrixGraph mg1;
 
     mg1.AddEdge(1, 2);
     mg1.AddEdge(1, 4);
@@ -260,10 +260,10 @@ int main()
     for (auto i : vertices_list) std::cout << i << " ";
     std::cout << "\n";
 
-    lg1.GetNextVertices(4, vertices);
+    lg1.GetNextVertices(1, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
-    lg1.GetPrevVertices(4, vertices);
+    lg1.GetPrevVertices(1, vertices);
     for (auto i : vertices) std::cout << i << " ";
     std::cout << "\n";
 }

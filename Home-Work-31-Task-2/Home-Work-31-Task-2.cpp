@@ -32,17 +32,17 @@ public:
         bool is_from_in_vertices = (list_next.find(from) != list_next.end() || list_prev.find(from) != list_prev.end());
 
         bool is_adge_from_to = false;
-        if (is_from_in_vertices) {
+        if (is_from_in_vertices) { // если from уже есть среди вершин графа, проверка на наличие ребра с to
 
-            for (auto i : list_next.find(from)->second) {
-                if (i == to) {
+            for (auto vertex_next : list_next.find(from)->second) {
+                if (to == vertex_next) {
                     is_adge_from_to = true;
                     break;
                 }
             }
         }
 
-        if (!is_adge_from_to) {
+        if (!is_adge_from_to) { // если ребра fron - to нет
             list_next[from].push_back(to);
             list_prev[to].push_back(from);
         }
@@ -51,9 +51,9 @@ public:
     }
 
     virtual int VerticesCount() const override {
-        int verticesCounter = list_next.size();
+        int verticesCounter = list_next.size(); // все вершины next
 
-        for (auto vertex_prev : list_prev) {
+        for (auto vertex_prev : list_prev) { // проверка повторения вершин из prev в списке вершин next
             bool is_prev_in_next = false;
 
             for (auto vertex_next : list_next) {
@@ -63,7 +63,7 @@ public:
                 }
             }
 
-            if (!is_prev_in_next) verticesCounter++;
+            if (!is_prev_in_next) verticesCounter++; // если prev нет среди next
         }
 
         return verticesCounter;
@@ -71,9 +71,9 @@ public:
 
     virtual std::vector<int> VerticesList() const override {
         std::vector<int> verticesList;
-        for(auto i : list_next) verticesList.push_back(i.first);
+        for(auto i : list_next) verticesList.push_back(i.first); // все вершины из list_next
 
-        for(auto vertex_prev : list_prev) {
+        for(auto vertex_prev : list_prev) { // проверка повторения vertex_prev в list_next
             bool is_prev_in_next = false;
 
             for(auto vertex_next : list_next) {
@@ -83,7 +83,7 @@ public:
                 }
             }
 
-            if (!is_prev_in_next) verticesList.push_back(vertex_prev.first);
+            if (!is_prev_in_next) verticesList.push_back(vertex_prev.first); // если vertex_prev нет в list_next
         }
 
         return verticesList;
@@ -92,9 +92,9 @@ public:
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
 
-        if (list_next.find(vertex) != list_next.end()) 
-            for (auto i : list_next.find(vertex)->second)
-                vertices.push_back(i);
+        if (list_next.find(vertex) != list_next.end()) // если vertex есть в list_next
+            for (auto vertex : list_next.find(vertex)->second)
+                vertices.push_back(vertex); 
 
         return;
     }
@@ -102,7 +102,7 @@ public:
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
 
-        if (list_prev.find(vertex) != list_prev.end())
+        if (list_prev.find(vertex) != list_prev.end()) // если vertex есть в list_prev
             for (auto i : list_prev.find(vertex)->second)
                 vertices.push_back(i);
 
@@ -130,18 +130,18 @@ public:
 
     virtual void AddEdge(int from, int to) override {
         bool is_fron_in_vertices = (vertex_to_index.find(from) != vertex_to_index.end());
-        if (!is_fron_in_vertices) {
+        if (!is_fron_in_vertices) { // если from нет среди вершин графа - добавить
             index_to_vertex.push_back(from);
             vertex_to_index[from] = index_to_vertex.size() - 1;
         }
 
         bool is_to_in_vertices = (vertex_to_index.find(to) != vertex_to_index.end());
-        if (from != to && !is_to_in_vertices) {
+        if (from != to && !is_to_in_vertices) { // если to нет среди вершин графа и не равен from - добавить
             index_to_vertex.push_back(to);
             vertex_to_index[to] = index_to_vertex.size() - 1;
         }
 
-        if (matrix.size() != index_to_vertex.size()) {
+        if (matrix.size() != index_to_vertex.size()) { // резайз матриц, если были добавлены вершины
             matrix.resize(index_to_vertex.size());
             for (int i = 0; i < matrix.size(); ++i)
                 matrix[i].resize(index_to_vertex.size());
@@ -150,7 +150,7 @@ public:
         int index_from = vertex_to_index.find(from)->second;
         int index_to = vertex_to_index.find(to)->second;
 
-        if(matrix[index_from][index_to] != 1)
+        if(matrix[index_from][index_to] != 1) // если ребра from - to нет --- добавть
             matrix[index_from][index_to] = 1;
 
         return;
@@ -166,7 +166,7 @@ public:
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) { // если vertex есть среди вершин графа
 
             int index_from = vertex_to_index.find(vertex)->second;
             for (int i = 0; i < index_to_vertex.size(); ++i)
@@ -177,7 +177,7 @@ public:
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) { // если vertex есть среди вершин графа
 
             int index_to = vertex_to_index.find(vertex)->second;
             for (int i = 0; i < index_to_vertex.size(); ++i)
@@ -196,32 +196,32 @@ private:
 ListGraph::ListGraph(const class MatrixGraph& other_graph) : IGraph(other_graph) {
     for (auto vertex : other_graph.VerticesList()) {
         std::vector<int> verticesList;
-        other_graph.GetNextVertices(vertex, verticesList);
-        if (verticesList.size() != 0)
+        other_graph.GetNextVertices(vertex, verticesList); // получить список next
+        if (verticesList.size() != 0) // если список не пустой добавть list_next
             for (auto next_vertex : verticesList) list_next[vertex].push_back(next_vertex);
 
-        other_graph.GetPrevVertices(vertex, verticesList);
-        if (verticesList.size() != 0)
+        other_graph.GetPrevVertices(vertex, verticesList); // получить список prev
+        if (verticesList.size() != 0) //если список не пустой добавть list_prev
             for (auto next_prev : verticesList) list_prev[vertex].push_back(next_prev);
     }
 }
 
 MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_graph) {
-    index_to_vertex = other_graph.VerticesList();
+    index_to_vertex = other_graph.VerticesList(); // получить список вершин графа
     int verticesCounter = index_to_vertex.size();
     
-    for (int i = 0; i < verticesCounter; ++i)
+    for (int i = 0; i < verticesCounter; ++i) // заполнить мап графа
         vertex_to_index[index_to_vertex[i]] = i;
 
-    matrix.resize(verticesCounter);
+    matrix.resize(verticesCounter); // ресайз матриц
     for (int i = 0; i < verticesCounter; ++i)
         matrix[i].resize(verticesCounter);
 
     for (auto vertex : index_to_vertex) {
         std::vector<int> next_vertices;
-        other_graph.GetNextVertices(vertex, next_vertices);
+        other_graph.GetNextVertices(vertex, next_vertices); // получить спиок next
 
-        for (auto next_vertex : next_vertices)
+        for (auto next_vertex : next_vertices) // заполнить матрицу
             matrix[vertex_to_index.find(vertex)->second][vertex_to_index.find(next_vertex)->second] = 1;
     }
 }
@@ -237,33 +237,37 @@ int main()
     mg1.AddEdge(100, 100);
     mg1.AddEdge(-1, 1);
 
-    std::cout << mg1.VerticesCount() << "\n";
+    std::cout << mg1.VerticesCount() << "\n"; // количество вершин в графе
 
     std::vector<int> vertices_list;
     vertices_list = mg1.VerticesList();
-    for (auto i : vertices_list) std::cout << i << " ";
+    for (auto i : vertices_list) std::cout << i << " "; // список вершин графа
     std::cout << "\n";
 
     std::vector<int> vertices;
     mg1.GetNextVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
+    for (auto i : vertices) std::cout << i << " "; // список next по вершине 1
     std::cout << "\n";
     mg1.GetPrevVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
+    for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
     std::cout << "\n";
 
-    ListGraph lg1(mg1);
+    ListGraph lg2;
+    lg2 = mg1;
 
-    std::cout << lg1.VerticesCount() << "\n";
+    MatrixGraph mg2;
+    mg2 = lg2;
 
-    vertices_list = lg1.VerticesList();
-    for (auto i : vertices_list) std::cout << i << " ";
+    std::cout << mg2.VerticesCount() << "\n"; // количество вершин в графе
+
+    vertices_list = mg2.VerticesList();
+    for (auto i : vertices_list) std::cout << i << " "; // список вершин графа
     std::cout << "\n";
 
-    lg1.GetNextVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
+    mg2.GetNextVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " "; // список next по вершине 1
     std::cout << "\n";
-    lg1.GetPrevVertices(1, vertices);
-    for (auto i : vertices) std::cout << i << " ";
+    mg2.GetPrevVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
     std::cout << "\n";
 }

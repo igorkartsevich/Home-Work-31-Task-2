@@ -26,7 +26,18 @@ public:
         list_prev = other_graph.list_prev;
     }
 
-    ListGraph(const class MatrixGraph& other_graph);
+    ListGraph(const IGraph& other_graph) : IGraph(other_graph) {
+        for (auto vertex : other_graph.VerticesList()) {
+            std::vector<int> verticesList;
+            other_graph.GetNextVertices(vertex, verticesList); // получить список next
+            if (verticesList.size() != 0) // если список не пустой добавть list_next
+                for (auto next_vertex : verticesList) list_next[vertex].push_back(next_vertex);
+
+            other_graph.GetPrevVertices(vertex, verticesList); // получить список prev
+            if (verticesList.size() != 0) //если список не пустой добавть list_prev
+                for (auto next_prev : verticesList) list_prev[vertex].push_back(next_prev);
+        }
+    }
 
     virtual void AddEdge(int from, int to) override {
         bool is_from_in_vertices = (list_next.find(from) != list_next.end() || list_prev.find(from) != list_prev.end());
@@ -126,7 +137,25 @@ public:
         matrix = other_graph.matrix;
     }
 
-    MatrixGraph(const class ListGraph& other_graph);
+    MatrixGraph(const IGraph& other_graph) : IGraph(other_graph) {
+        index_to_vertex = other_graph.VerticesList(); // получить список вершин графа
+        int verticesCounter = index_to_vertex.size();
+
+        for (int i = 0; i < verticesCounter; ++i) // заполнить мап графа
+            vertex_to_index[index_to_vertex[i]] = i;
+
+        matrix.resize(verticesCounter); // ресайз матриц
+        for (int i = 0; i < verticesCounter; ++i)
+            matrix[i].resize(verticesCounter);
+
+        for (auto vertex : index_to_vertex) {
+            std::vector<int> next_vertices;
+            other_graph.GetNextVertices(vertex, next_vertices); // получить спиок next
+
+            for (auto next_vertex : next_vertices) // заполнить матрицу
+                matrix[vertex_to_index.find(vertex)->second][vertex_to_index.find(next_vertex)->second] = 1;
+        }
+    }
 
     virtual void AddEdge(int from, int to) override {
         bool is_fron_in_vertices = (vertex_to_index.find(from) != vertex_to_index.end());
@@ -192,39 +221,6 @@ private:
     std::vector<int> index_to_vertex;
     std::vector<std::vector<int>> matrix;
 };
-
-ListGraph::ListGraph(const class MatrixGraph& other_graph) : IGraph(other_graph) {
-    for (auto vertex : other_graph.VerticesList()) {
-        std::vector<int> verticesList;
-        other_graph.GetNextVertices(vertex, verticesList); // получить список next
-        if (verticesList.size() != 0) // если список не пустой добавть list_next
-            for (auto next_vertex : verticesList) list_next[vertex].push_back(next_vertex);
-
-        other_graph.GetPrevVertices(vertex, verticesList); // получить список prev
-        if (verticesList.size() != 0) //если список не пустой добавть list_prev
-            for (auto next_prev : verticesList) list_prev[vertex].push_back(next_prev);
-    }
-}
-
-MatrixGraph::MatrixGraph(const class ListGraph& other_graph) : IGraph(other_graph) {
-    index_to_vertex = other_graph.VerticesList(); // получить список вершин графа
-    int verticesCounter = index_to_vertex.size();
-    
-    for (int i = 0; i < verticesCounter; ++i) // заполнить мап графа
-        vertex_to_index[index_to_vertex[i]] = i;
-
-    matrix.resize(verticesCounter); // ресайз матриц
-    for (int i = 0; i < verticesCounter; ++i)
-        matrix[i].resize(verticesCounter);
-
-    for (auto vertex : index_to_vertex) {
-        std::vector<int> next_vertices;
-        other_graph.GetNextVertices(vertex, next_vertices); // получить спиок next
-
-        for (auto next_vertex : next_vertices) // заполнить матрицу
-            matrix[vertex_to_index.find(vertex)->second][vertex_to_index.find(next_vertex)->second] = 1;
-    }
-}
 
 int main()
 {

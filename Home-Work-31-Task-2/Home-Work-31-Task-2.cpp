@@ -19,12 +19,9 @@ class ListGraph : public IGraph {
 public:
     virtual ~ListGraph() {}
 
-    ListGraph() : IGraph() {}
+    ListGraph() = default;
 
-    ListGraph(const ListGraph& other_graph) : IGraph(other_graph) {
-        list_next = other_graph.list_next;
-        list_prev = other_graph.list_prev;
-    }
+    ListGraph(const ListGraph&) = default;
 
     ListGraph(const IGraph& other_graph) : IGraph(other_graph) {
         for (auto vertex : other_graph.VerticesList()) {
@@ -129,13 +126,9 @@ class MatrixGraph : public IGraph {
 public:
     virtual ~MatrixGraph() {}
 
-    MatrixGraph() : IGraph() {}
+    MatrixGraph() = default;
 
-    MatrixGraph(const MatrixGraph& other_graph) : IGraph(other_graph) {
-        vertex_to_index = other_graph.vertex_to_index;
-        index_to_vertex = other_graph.index_to_vertex;
-        matrix = other_graph.matrix;
-    }
+    MatrixGraph(const MatrixGraph&) = default;
 
     MatrixGraph(const IGraph& other_graph) : IGraph(other_graph) {
         index_to_vertex = other_graph.VerticesList(); // получить список вершин графа

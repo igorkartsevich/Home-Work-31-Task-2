@@ -89,27 +89,56 @@ public:
     }
 
     virtual void AddEdge(int from, int to) override {
+        bool is_from_in_vertices = vertex_to_index.find(from) != vertex_to_index.end();
+        bool is_to_in_vertices = vertex_to_index.find(to) != vertex_to_index.end();
+
+        if (!is_from_in_vertices) {
+            index_to_vertex.push_back(from);
+            vertex_to_index[from] = index_to_vertex.size() - 1;
+        }
+        if (!is_to_in_vertices && from != to) {
+            index_to_vertex.push_back(to);
+            vertex_to_index[to] = index_to_vertex.size() - 1;
+        }
+        if (!is_from_in_vertices || !is_to_in_vertices) {
+            int size = index_to_vertex.size();
+            matrix.resize(size);
+            for (int i = 0; i < matrix.size(); ++i) matrix[i].resize(size);
+        }
         
+        matrix[vertex_to_index.find(from)->second][vertex_to_index.find(to)->second] = 1;
     }
 
     virtual int VerticesCount() const override {
-        return 0;
+        return index_to_vertex.size();
     }
 
     virtual std::vector<int> VerticesList() const override {
-        std::vector<int> verticesList;
-        return verticesList;
+        return index_to_vertex;
     }
 
     virtual void GetNextVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-        
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+            int counter = 0;
+            int index = vertex_to_index.find(vertex)->second;
+            std::for_each(matrix[index].begin(), matrix[index].end(), [&](int a) {
+                if (a == 1) vertices.push_back(index_to_vertex[++counter]);
+            });
+        }
         return;
     }
 
     virtual void GetPrevVertices(int vertex, std::vector<int>& vertices) const override {
         vertices.clear();
-
+        if (vertex_to_index.find(vertex) != vertex_to_index.end()) {
+            int counter = 0;
+            int index = vertex_to_index.find(vertex)->second;
+            std::for_each(matrix.begin(), matrix.end(), [&](auto vector) {
+                if (vector[index] == 1) vertices.push_back(index_to_vertex[counter]);
+                ++counter;
+                });
+        }
         return;
     }
 
@@ -121,7 +150,7 @@ private:
 
 int main()
 {
-    ListGraph mg1;
+    MatrixGraph mg1;
 
     mg1.AddEdge(1, 2);
     mg1.AddEdge(1, 4);

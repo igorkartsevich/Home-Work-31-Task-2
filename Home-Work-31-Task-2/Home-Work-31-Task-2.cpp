@@ -26,14 +26,24 @@ public:
     ListGraph(const ListGraph&) = default;
 
     ListGraph(const IGraph& other_graph) : IGraph(other_graph) {
-        
+        std::vector<int> verticesList = other_graph.VerticesList();
+        std::for_each(verticesList.begin(), verticesList.end(), [&](int vertex) {
+
+            std::vector<int> vertices_TMP;
+            other_graph.GetNextVertices(vertex, vertices_TMP);
+
+            std::for_each(vertices_TMP.begin(), vertices_TMP.end(), [&](int vertex_next) {
+                list_next[vertex].push_back(vertex_next);
+                list_prev[vertex_next].push_back(vertex);
+                });
+            });
     }
 
     virtual void AddEdge(int from, int to) override {
         if (std::find(list_next[from].begin(), list_next[from].end(), to) == list_next[from].end()) {
             list_next[from].push_back(to);
             list_prev[to].push_back(from);
-        }       
+        }
     }
 
     virtual int VerticesCount() const override {
@@ -105,7 +115,7 @@ public:
             matrix.resize(size);
             for (int i = 0; i < matrix.size(); ++i) matrix[i].resize(size);
         }
-        
+
         matrix[vertex_to_index.find(from)->second][vertex_to_index.find(to)->second] = 1;
     }
 
@@ -123,8 +133,9 @@ public:
             int counter = 0;
             int index = vertex_to_index.find(vertex)->second;
             std::for_each(matrix[index].begin(), matrix[index].end(), [&](int a) {
-                if (a == 1) vertices.push_back(index_to_vertex[++counter]);
-            });
+                if (a == 1) vertices.push_back(index_to_vertex[counter]);
+                ++counter;
+                });
         }
         return;
     }
@@ -174,19 +185,19 @@ int main()
     for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
     std::cout << "\n";
 
-    //MatrixGraph mg2;
-    //mg2 = mg1;
+    ListGraph mg2;
+    mg2 = mg1;
 
-    //std::cout << mg2.VerticesCount() << "\n"; // количество вершин в графе
+    std::cout << mg2.VerticesCount() << "\n"; // количество вершин в графе
 
-    //vertices_list = mg2.VerticesList();
-    //for (auto i : vertices_list) std::cout << i << " "; // список вершин графа
-    //std::cout << "\n";
+    vertices_list = mg2.VerticesList();
+    for (auto i : vertices_list) std::cout << i << " "; // список вершин графа
+    std::cout << "\n";
 
-    //mg2.GetNextVertices(1, vertices);
-    //for (auto i : vertices) std::cout << i << " "; // список next по вершине 1
-    //std::cout << "\n";
-    //mg2.GetPrevVertices(1, vertices);
-    //for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
-    //std::cout << "\n";
+    mg2.GetNextVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " "; // список next по вершине 1
+    std::cout << "\n";
+    mg2.GetPrevVertices(1, vertices);
+    for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
+    std::cout << "\n";
 }

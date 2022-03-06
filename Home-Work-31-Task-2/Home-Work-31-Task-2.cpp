@@ -95,7 +95,26 @@ public:
     MatrixGraph(const MatrixGraph&) = default;
 
     MatrixGraph(const IGraph& other_graph) : IGraph(other_graph) {
-        
+        index_to_vertex = other_graph.VerticesList();
+
+        int counter = 0;
+        std::for_each(index_to_vertex.begin(), index_to_vertex.end(), [&](int vertex) {
+            vertex_to_index[vertex] = counter++;
+        });
+
+        int size_matrix = index_to_vertex.size();
+        matrix.resize(size_matrix);
+        std::for_each(matrix.begin(), matrix.end(), [&](auto& element_vector) {
+            element_vector.resize(size_matrix);
+            });
+
+        std::for_each(index_to_vertex.begin(), index_to_vertex.end(), [&](int vertex) {
+            std::vector<int> vertices_TMP;
+            other_graph.GetNextVertices(vertex, vertices_TMP);
+            std::for_each(vertices_TMP.begin(), vertices_TMP.end(), [&](int vertex_next) {
+                matrix[vertex_to_index.find(vertex)->second][vertex_to_index.find(vertex_next)->second] = 1;
+            });
+        });
     }
 
     virtual void AddEdge(int from, int to) override {
@@ -161,7 +180,7 @@ private:
 
 int main()
 {
-    MatrixGraph mg1;
+    ListGraph mg1;
 
     mg1.AddEdge(1, 2);
     mg1.AddEdge(1, 4);
@@ -185,7 +204,7 @@ int main()
     for (auto i : vertices) std::cout << i << " "; // список prev по вершине 1
     std::cout << "\n";
 
-    ListGraph mg2;
+    MatrixGraph mg2;
     mg2 = mg1;
 
     std::cout << mg2.VerticesCount() << "\n"; // количество вершин в графе
